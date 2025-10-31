@@ -1,0 +1,5 @@
+﻿[
+  { "id": 1, "title": "Velada Profesional Santiago", "date": "2025-09-12", "image_url": "/app/images/evento1.jpg" },
+  { "id": 2, "title": "Torneo Amateur Centro", "date": "2025-08-05", "image_url": "/app/images/evento2.jpg" },
+  { "id": 3, "title": "Exhibición Valparaíso", "date": "2025-07-10", "image_url": "/app/images/evento3.jpg" }
+]

@@ -1,0 +1,66 @@
+export function HeroRing() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <svg
+        className="absolute w-full h-full"
+        viewBox="0 0 1200 800"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <line
+          x1="0"
+          y1="200"
+          x2="1200"
+          y2="200"
+          stroke="#FFD60A"
+          strokeWidth="2"
+          opacity="0.3"
+        />
+        <line
+          x1="0"
+          y1="400"
+          x2="1200"
+          y2="400"
+          stroke="#FFD60A"
+          strokeWidth="2"
+          opacity="0.3"
+        />
+        <line
+          x1="0"
+          y1="600"
+          x2="1200"
+          y2="600"
+          stroke="#FFD60A"
+          strokeWidth="2"
+          opacity="0.3"
+        />
+        <line
+          x1="200"
+          y1="0"
+          x2="200"
+          y2="800"
+          stroke="#FFD60A"
+          strokeWidth="2"
+          opacity="0.3"
+        />
+        <line
+          x1="1000"
+          y1="0"
+          x2="1000"
+          y2="800"
+          stroke="#FFD60A"
+          strokeWidth="2"
+          opacity="0.3"
+        />
+        <circle
+          cx="600"
+          cy="400"
+          r="300"
+          stroke="#D90429"
+          strokeWidth="4"
+          opacity="0.2"
+        />
+      </svg>
+    </div>
+  );
+}

@@ -1,0 +1,18 @@
+﻿[
+  {
+    "id": 1,
+    "title": "Técnica de Guardias",
+    "description": "Posicionamiento de manos y pies para máxima defensa y contraataque.",
+    "image_url": "https://images.pexels.com/photos/4754146/pexels-photo-4754146.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "icon": "Shield",
+    "gradient": "from-[#FFD60A]/20 via-transparent to-transparent"
+  },
+  {
+    "id": 2,
+    "title": "Trabajo de Pies",
+    "description": "Desplazamientos, ángulos y control de distancia para dominar el ring.",
+    "image_url": "https://images.pexels.com/photos/3573063/pexels-photo-3573063.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "icon": "Footprints",
+    "gradient": "from-[#FFA500]/20 via-transparent to-transparent"
+  }
+]
