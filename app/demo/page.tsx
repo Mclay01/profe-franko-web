@@ -110,19 +110,16 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
                   asChild
-                  size="md"
                   className="bg-gradient-to-r from-[#FFD60A] to-[#FFA500] text-[#0A0A0A] hover:from-[#FFA500] hover:to-[#FFD60A] font-bold px-8 py-5 shadow-2xl shadow-[#FFD60A]/30 transition-all"
                 >
                   <Link href="/tienda" className="flex items-center gap-2">
                     Ver catálogo completo
-                    <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  size="md"
                   variant="outline"
                   className="border-2 border-[#FFD60A] text-[#FFD60A] hover:bg-[#FFD60A] hover:text-[#0A0A0A] font-bold px-8 py-5 backdrop-blur-sm bg-[#FFD60A]/5 transition-all"
                   onClick={() => setContactOpen(true)}
@@ -141,36 +138,17 @@ export default function Home() {
       <section id="proximo-evento" className="py-20 bg-gradient-to-b from-[#0A0A0A] via-[#111111] to-[#0A0A0A] relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,214,10,0.06),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-4xl mx-auto bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] border-2 border-[#FFD60A]/30 rounded-3xl p-8 md:p-12 text-center"
-          >
-            <p className="text-[#FFD60A] font-semibold tracking-wide mb-2">Próximo evento</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 font-[var(--font-saira)]">
-              Noche de Boxeo – Santiago
-            </h2>
-            <p className="text-white/80 mb-6">
-              Sábado 15 de Febrero, 20:00 hrs · Gimnasio Municipal · Av. Siempre Viva 123
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                asChild
-                className="bg-gradient-to-r from-[#FFD60A] to-[#FFA500] text-[#0A0A0A] hover:from-[#FFA500] hover:to-[#FFD60A] font-bold px-8 py-5"
-              >
-                <Link href="/entradas">Compra tus entradas</Link>
-              </Button>
-              <Button
-                variant="outline"
-                className="border-2 border-[#FFD60A] text-[#FFD60A] hover:bg-[#FFD60A] hover:text-[#0A0A0A] font-bold px-8 py-5"
-                onClick={() => setContactOpen(true)}
-              >
-                Quiero más info
-              </Button>
-            </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              size="default"
+              variant="outline"
+              className="border-2 border-[#FFD60A] text-[#FFD60A] hover:bg-[#FFD60A] hover:text-[#0A0A0A] font-bold px-8 py-5 backdrop-blur-sm bg-[#FFD60A]/5 transition-all"
+              onClick={() => setContactOpen(true)}
+            >
+              Quiero más info
+            </Button>
           </motion.div>
+
         </div>
       </section>
 

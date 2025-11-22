@@ -88,7 +88,7 @@ export function EventContactDrawer({ open, onOpenChange }: EventContactDrawerPro
     setFormData(prev => {
       const currentValues = prev[field];
       const newValues = currentValues.includes(value)
-        ? currentValues.filter(item => item !== value)
+        ? currentValues.filter((item: string) => item !== value)
         : [...currentValues, value];
       return { ...prev, [field]: newValues };
     });

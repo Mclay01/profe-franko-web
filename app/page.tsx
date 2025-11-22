@@ -114,19 +114,17 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
                   asChild
-                  size="md"
+                  size="default"
                   className="bg-gradient-to-r from-[#FFD60A] to-[#FFA500] text-[#0A0A0A] hover:from-[#FFA500] hover:to-[#FFD60A] font-bold px-8 py-5 shadow-2xl shadow-[#FFD60A]/30 transition-all"
                 >
                   <Link href="/tienda" className="flex items-center gap-2">
                     Ver catálogo completo
-                    <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  size="md"
                   variant="outline"
                   className="border-2 border-[#FFD60A] text-[#FFD60A] hover:bg-[#FFD60A] hover:text-[#0A0A0A] font-bold px-8 py-5 backdrop-blur-sm bg-[#FFD60A]/5 transition-all"
                   onClick={() => {
