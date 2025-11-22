@@ -9,13 +9,13 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Trophy className="h-6 w-6 text-[#FFD60A]" />
-              <span className="text-lg font-bold">Boxing Chile</span>
+              <span className="text-lg font-bold">Profe Franko</span>
             </div>
             <p className="text-sm text-white/70">
               Organizador profesional de eventos de boxeo. Elevando el deporte en Chile.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-white/70 hover:text-[#FFD60A] transition-colors">
+              <a href="https://www.instagram.com/frankoesteban_/" className="text-white/70 hover:text-[#FFD60A] transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="text-white/70 hover:text-[#FFD60A] transition-colors">
@@ -44,13 +44,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#logros" className="text-white/70 hover:text-white transition-colors">
-                  Logros
-                </Link>
-              </li>
-              <li>
-                <Link href="/eventos" className="text-white/70 hover:text-white transition-colors">
-                  Eventos
+                <Link href="/eventos/cotizar" className="text-white/70 hover:text-white transition-colors">
+                  Tu Evento
                 </Link>
               </li>
             </ul>
@@ -59,16 +54,6 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-[#FFD60A] mb-4">Partners</h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/partners" className="text-white/70 hover:text-white transition-colors">
-                  Clubes
-                </Link>
-              </li>
-              <li>
-                <Link href="/partners" className="text-white/70 hover:text-white transition-colors">
-                  Federaciones
-                </Link>
-              </li>
               <li>
                 <Link href="/tienda" className="text-white/70 hover:text-white transition-colors">
                   Tienda Olymphus
@@ -90,19 +75,15 @@ export function Footer() {
                   Términos
                 </Link>
               </li>
-              <li>
-                <Link href="/legal/devoluciones" className="text-white/70 hover:text-white transition-colors">
-                  Devoluciones
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t border-[#FFD60A]/20 text-center text-sm text-white/60">
-          <p>&copy; {new Date().getFullYear()} Boxing Chile. Todos los derechos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Profe Franko. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
   );
 }
+export default Footer;

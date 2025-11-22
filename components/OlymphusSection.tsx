@@ -80,7 +80,7 @@ export default function OlymphusSection({
       aria-labelledby="oly-title"
       className={`relative isolate overflow-hidden bg-[#0A0A0A] py-20 md:py-28 lg:py-32 ${className}`}
     >
-      {/* Radial gradients - warm gamer aesthetic */}
+      {/* Radiales */}
       <div
         className="pointer-events-none absolute -left-1/4 -top-1/4 h-[35rem] w-[35rem] bg-[radial-gradient(circle,rgba(255,214,10,0.28),transparent_60%)] blur-3xl"
         aria-hidden="true"
@@ -90,29 +90,28 @@ export default function OlymphusSection({
         aria-hidden="true"
       />
 
-      {/* Subtle grid overlay */}
+      {/* Grid sutil */}
       <div
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:36px_36px]"
         aria-hidden="true"
       />
 
-      {/* Diagonal gradient base */}
+      {/* Base diagonal */}
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/60 via-zinc-950/40 to-black/60"
         aria-hidden="true"
       />
 
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main two-column layout */}
+        {/* Dos columnas */}
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-16">
-          {/* Left column - Copy */}
+          {/* Izquierda: texto */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="flex flex-col justify-center"
           >
-            {/* Badge */}
             <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-4 py-1.5 backdrop-blur-sm">
               <Award className="h-4 w-4 text-yellow-400" aria-hidden="true" />
               <span className="text-sm font-semibold tracking-wide text-yellow-400">
@@ -120,7 +119,6 @@ export default function OlymphusSection({
               </span>
             </div>
 
-            {/* Title */}
             <h2
               id="oly-title"
               className="mb-4 font-[var(--font-saira)] text-5xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
@@ -128,18 +126,15 @@ export default function OlymphusSection({
               Olymphus
             </h2>
 
-            {/* Subtitle */}
             <p className="mb-6 text-xl font-medium text-zinc-300 md:text-2xl">
               Equipamiento profesional para boxeo
             </p>
 
-            {/* Description */}
             <p className="mb-8 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
               Gracias a su apoyo constante, contamos con el catálogo completo de productos Olymphus.
               Equipamiento de alta calidad diseñado para peleadores, entrenadores y clubes profesionales.
             </p>
 
-            {/* Feature chips */}
             <div className="mb-10 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
               {features.map((feature, idx) => (
                 <motion.div
@@ -155,7 +150,6 @@ export default function OlymphusSection({
               ))}
             </div>
 
-            {/* Primary CTA */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -171,7 +165,7 @@ export default function OlymphusSection({
             </motion.div>
           </motion.div>
 
-          {/* Right column - Visual card */}
+          {/* Derecha: tarjeta visual */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -179,14 +173,12 @@ export default function OlymphusSection({
             className="relative"
           >
             <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-950 to-zinc-900 p-6 shadow-2xl md:p-8">
-              {/* Ring ropes - horizontal lines */}
               <div className="absolute left-0 right-0 top-12 space-y-4" aria-hidden="true">
                 <div className="h-1 bg-gradient-to-r from-transparent via-yellow-400/60 to-transparent" />
                 <div className="h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                 <div className="h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
               </div>
 
-              {/* Card header */}
               <div className="relative z-10 mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20 ring-2 ring-yellow-400/40">
@@ -200,7 +192,6 @@ export default function OlymphusSection({
                   </div>
                 </div>
 
-                {/* Mini CTA */}
                 <Link
                   href={catalogUrl}
                   className="rounded-lg bg-zinc-800/80 px-3 py-1.5 text-xs font-semibold text-yellow-400 backdrop-blur-sm transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-yellow-400/50"
@@ -210,12 +201,10 @@ export default function OlymphusSection({
                 </Link>
               </div>
 
-              {/* Hero visual area */}
               <div className="relative z-10 aspect-[16/10] overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,214,10,0.15),transparent_50%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(217,4,41,0.12),transparent_50%)]" />
 
-                {/* Central icon/logo placeholder */}
                 <div className="flex h-full items-center justify-center">
                   <div className="relative">
                     <div className="absolute inset-0 animate-pulse bg-yellow-400/20 blur-2xl" />
@@ -223,13 +212,11 @@ export default function OlymphusSection({
                   </div>
                 </div>
 
-                {/* Decorative corner badge */}
                 <div className="absolute right-4 top-4 rounded-full bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg">
                   Pro
                 </div>
               </div>
 
-              {/* Stats or info pills */}
               <div className="relative z-10 mt-6 flex flex-wrap gap-3">
                 <div className="rounded-lg bg-zinc-800/60 px-3 py-2 backdrop-blur-sm">
                   <p className="text-xs text-zinc-500">Productos</p>
@@ -248,7 +235,7 @@ export default function OlymphusSection({
           </motion.div>
         </div>
 
-        {/* Horizontal product carousel */}
+        {/* Carrusel de productos */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -282,24 +269,22 @@ export default function OlymphusSection({
                   transition={{ duration: 0.5, delay: 0.5 + idx * 0.1 }}
                   className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition-all hover:border-zinc-700 hover:shadow-xl focus-within:ring-2 focus-within:ring-yellow-400/50"
                 >
-                  {/* Image */}
+                  {/* Image (Next.js) */}
                   <div className="relative aspect-[4/3] overflow-hidden bg-zinc-800">
-                    <img
+                    <Image
                       src={product.image}
                       alt={product.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      width={280}
-                      height={210}
+                      fill
+                      unoptimized
+                      sizes="(max-width: 640px) 85vw, 280px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
 
-                    {/* PRO badge */}
                     <div className="absolute right-2 top-2 rounded-full bg-red-600 px-2 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg">
                       Pro
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div className="p-4">
                     <h4 className="mb-2 line-clamp-2 min-h-[2.5rem] font-semibold text-white group-hover:text-yellow-400">
                       {product.title}

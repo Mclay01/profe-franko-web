@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-saira: 'Saira Condensed', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  line-height: 1.5;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+/* ===== Tarjeta RS (nuevo diseño) ===== */
+.socials-card .card{
+  position: relative;
+  width: 100%;            /* ajustado al contenedor existente */
+  height: 100%;           /* ajustado al contenedor existente */
+  background: lightgrey;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  transition: all 1s ease-in-out;
+  border: 2px solid #fff;
+}
+.socials-card .background{
+  position: absolute;
+  inset: 0;
+  background-color: #4158D0;
+  background-image: linear-gradient(43deg, #440909 0%, #ae0000 35%, #ffee00 100%);
+}
+.socials-card .logo{
+  position: absolute;
+  right: 50%;
+  bottom: 50%;
+  transform: translate(50%, 50%);
+  transition: all 0.6s ease-in-out;
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 3px;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.socials-card .logo .logo-svg{ width: 30px; height: 30px; }
+
+.socials-card .icon{ display: inline-block; width: 20px; height: 20px; }
+.socials-card .icon .svg{
+  fill: rgba(255,255,255,0.797);
+  width: 100%;
+  transition: all .5s ease-in-out;
+}
+
+.socials-card .box{
+  position: absolute;
+  padding: 10px;
+  text-align: right;
+  background: rgba(255,255,255,0.389);
+  border-top: 2px solid #fff;
+  border-right: 1px solid #fff;
+  border-radius: 10% 13% 42% 0%/10% 12% 75% 0%;
+  box-shadow: rgba(100,100,111,0.364) -7px 7px 29px 0px;
+  transform-origin: bottom left;
+  transition: all 1s ease-in-out;
+}
+.socials-card .box::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: all .5s ease-in-out;
+}
+.socials-card .box:hover .svg{ fill: #fff; }
+
+.socials-card .box1{ width:70%; height:70%; bottom:-70%; left:-70%; }
+.socials-card .box1::before{
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #ff53d4 60%, #62c2fe 90%);
+}
+.socials-card .box1:hover::before{ opacity: 1; }
+.socials-card .box1:hover .icon .svg{ filter: drop-shadow(0 0 5px #fff); }
+
+.socials-card .box2{ width:50%; height:50%; bottom:-50%; left:-50%; transition-delay:.2s; }
+.socials-card 
+/* X (Twitter) — overlay negro degradado de arriba hacia abajo */
+.box2::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.70) 60%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+}
+
+.socials-card .box2:hover::before{ opacity: 1; }
+.socials-card .box2:hover .icon .svg{ filter: drop-shadow(0 0 5px #fff); }
+
+.socials-card .box3{ width:30%; height:30%; bottom:-30%; left:-30%; transition-delay:.4s; }
+.socials-card 
+/* Facebook — overlay azul */
+.box3::before {
+  background: radial-gradient(
+    circle at 30% 107%,
+    #cfe8ff 0%,
+    #1877F2 90%
+  );
+}
+.socials-card .box3:hover::before{ opacity: 1; }
+.socials-card .box3:hover .icon .svg{ filter: drop-shadow(0 0 5px #fff); }
+
+.socials-card .box4{ width:10%; height:10%; bottom:-10%; left:-10%; transition-delay:.6s; }
+
+.socials-card .card:hover{ transform: scale(1.1); }
+.socials-card .card:hover .box{ bottom:-1px; left:-1px; }
+.socials-card .card:hover .logo{ transform: translate(70px, -52px); letter-spacing: 0px; }
+
+/* Botón “Contáctame por:” estilo blob/glow */
+.contact-btn{
+  cursor:pointer;
+  font-size:14px; /* ~1.4rem en tu ejemplo, ajustado a UI actual */
+  border-radius:16px;
+  border:none;
+  padding:2px;
+  background:radial-gradient(circle 80px at 80% -10%, #ffffff, #181b1b);
+  position:relative;
+  isolation:isolate; /* asegura capas correctas con ::after */
+}
+.contact-btn::after{
+  content:"";
+  position:absolute;
+  width:65%;
+  height:60%;
+  border-radius:120px;
+  top:0;
+  right:0;
+  box-shadow:0 0 20px #ffffff38;
+  z-index:-1;
+}
+
+.contact-blob1{
+  position:absolute;
+  width:70px;
+  height:100%;
+  border-radius:16px;
+  bottom:0;
+  left:0;
+  background:radial-gradient(circle 60px at 0% 100%, #3fe9ff, #0000ff80, transparent);
+  box-shadow:-10px 10px 30px #0051ff2d;
+}
+
+.contact-inner{
+  padding:14px 25px;
+  border-radius:14px;
+  color:#fff;
+  z-index:3;
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:radial-gradient(circle 80px at 80% -50%, #777777, #0f1111);
+}
+.contact-inner::before{
+  content:"";
+  width:100%;
+  height:100%;
+  left:0;
+  top:0;
+  border-radius:14px;
+  background:radial-gradient(circle 60px at 0% 100%, #00e1ff1a, #0000ff11, transparent);
+  position:absolute;
+}

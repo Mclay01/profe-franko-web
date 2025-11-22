@@ -13,15 +13,20 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./*"]
-    }
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",                          // 👈 agrega esto
+    "paths": { "@/*": ["./*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next", "out", ".expo", "mobile"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    ".expo",
+    "mobile",
+    "_trash_expo/**",                        // 👈 carpeta donde movimos los archivos de Expo
+    "app/_layout.tsx",                       // 👈 por si siguen ahí…
+    "app/+not-found.tsx",
+    "app/index.tsx"
+  ]
 }

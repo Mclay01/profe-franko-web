@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 
 interface ThreeDMockupProps {
   selectedColor: { name: string; color: string };
@@ -30,7 +31,7 @@ export default function ThreeDMockup({
       borderRadius: 20,
       backgroundColor: selectedColor?.color ?? '#FFD60A',
       boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-      transform: 'perspective(900px) rotateX(8deg) rotateY(-8deg)', // ligero efecto pseudo-3D
+      transform: 'perspective(900px) rotateX(8deg) rotateY(-8deg)', // pseudo-3D
       overflow: 'hidden',
     },
     frontPanel: {
@@ -42,6 +43,7 @@ export default function ThreeDMockup({
       borderRadius: 20,
     },
     designArea: {
+      position: 'relative', // necesario para <Image fill />
       width: 120,
       height: 120,
       borderRadius: 8,
@@ -51,12 +53,6 @@ export default function ThreeDMockup({
       placeItems: 'center',
       overflow: 'hidden',
       backdropFilter: 'blur(2px)',
-    },
-    designImg: {
-      maxWidth: '100%',
-      maxHeight: '100%',
-      objectFit: 'contain',
-      display: 'block',
     },
     colorLabel: {
       position: 'absolute',
@@ -74,13 +70,14 @@ export default function ThreeDMockup({
         <div style={styles.frontPanel}>
           {designImage ? (
             <div style={styles.designArea} aria-label="Área de diseño">
-              <img
+              <Image
                 src={designImage}
                 alt={`Diseño aplicado - color ${selectedColor?.name ?? ''}`}
-                style={styles.designImg}
-                width={120}
-                height={120}
-                loading="lazy"
+                fill
+                sizes="120px"
+                unoptimized
+                priority={false}
+                style={{ objectFit: 'contain' }}
               />
             </div>
           ) : (
