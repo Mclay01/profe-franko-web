@@ -1,9 +1,10 @@
-// app/api/contact/route.ts
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import path from 'path';
+import fs from 'fs';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 // ---------- CONFIG EMAIL ----------
 
@@ -17,31 +18,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const LOGO_PATH = path.join(
-  process.cwd(),
-  'public',
-  'img',
-  'logo-profefranko.png',
-);
+// Rol para mostrarlo bonito
+const ROLE_LABELS: Record<string, string> = {
+  peleador: 'Peleador',
+  arbitro: 'Árbitro',
+  entrenador: 'Entrenador',
+  club: 'Club',
+  federacion: 'Federación',
+  otros: 'Otros',
+};
 
-// helper para mostrar bonito el rol
-function formatRole(raw?: string) {
-  if (!raw) return '';
-  const key = raw.toString().trim().toLowerCase();
-  const map: Record<string, string> = {
-    peleador: 'Peleador',
-    'peleador/a': 'Peleador',
-    arbitro: 'Árbitro',
-    árbitro: 'Árbitro',
-    entrenador: 'Entrenador',
-    club: 'Club',
-    federacion: 'Federación',
-    federación: 'Federación',
-    otros: 'Otros',
-    otro: 'Otros',
-  };
-  return map[key] ?? raw;
-}
+// Colores de marca para el PDF
+const PDF_COLORS = {
+  headerBg: rgb(5 / 255, 5 / 255, 5 / 255),
+  yellow: rgb(255 / 255, 214 / 255, 10 / 255),
+  textMain: rgb(17 / 255, 24 / 255, 39 / 255),
+  textMuted: rgb(107 / 255, 114 / 255, 128 / 255),
+  line: rgb(229 / 255, 231 / 255, 235 / 255),
+};
 
 // ---------- HANDLER ----------
 
@@ -49,263 +43,187 @@ export async function POST(req: Request) {
   try {
     const contentType = req.headers.get('content-type') || '';
 
-    let name = '';
-    let email = '';
-    let phone = '';
-    let message = '';
-
-    let orgType = '';       // Federación / Club / Peleador / etc.
-    let organization = '';  // Nombre de la organización
-    let city = '';
-    let country = '';
+    let payload: any = {};
 
     if (contentType.includes('application/json')) {
-      const body = await req.json();
-
-      name =
-        (body.name ||
-          body.nombre ||
-          '')?.toString().trim();
-      email = (body.email || '')?.toString().trim();
-      phone =
-        (body.phone ||
-          body.telefono ||
-          '')?.toString().trim();
-      message =
-        (body.message ||
-          body.mensaje ||
-          '')?.toString();
-
-      // ⬅️ AQUÍ METEMOS role COMO TIPO DE ENTIDAD
-      const rawRoleOrType =
-        body.role ||
-        body.org_type ||
-        body.organization_type ||
-        body.organizationType ||
-        body.entity_type ||
-        body.entityType ||
-        body.tipo_organizacion ||
-        body.tipoOrganizacion ||
-        body.tipo_entidad ||
-        body.tipoEntidad ||
-        '';
-
-      orgType = formatRole(rawRoleOrType);
-
-      organization =
-        (body.organization ||
-          body.organizacion ||
-          body.organización ||
-          body.organization_name ||
-          body.organizationName ||
-          body.nombre_organizacion ||
-          body.nombreOrganizacion ||
-          '')?.toString().trim();
-
-      city =
-        (body.city ||
-          body.ciudad ||
-          '')?.toString().trim();
-
-      country =
-        (body.country ||
-          body.pais ||
-          body.país ||
-          '')?.toString().trim();
+      payload = await req.json();
     } else {
       const formData = await req.formData();
-
-      name = (
-        formData.get('name') ||
-        formData.get('nombre') ||
-        ''
-      ).toString().trim();
-
-      email = (
-        formData.get('email') ||
-        ''
-      ).toString().trim();
-
-      phone = (
-        formData.get('phone') ||
-        formData.get('telefono') ||
-        ''
-      ).toString().trim();
-
-      message = (
-        formData.get('message') ||
-        formData.get('mensaje') ||
-        ''
-      ).toString();
-
-      const rawRoleOrType =
-        formData.get('role') ||
-        formData.get('org_type') ||
-        formData.get('organization_type') ||
-        formData.get('organizationType') ||
-        formData.get('entity_type') ||
-        formData.get('entityType') ||
-        formData.get('tipo_organizacion') ||
-        formData.get('tipoOrganizacion') ||
-        formData.get('tipo_entidad') ||
-        formData.get('tipoEntidad') ||
-        '';
-
-      orgType = formatRole(rawRoleOrType?.toString());
-
-      organization = (
-        formData.get('organization') ||
-        formData.get('organizacion') ||
-        formData.get('organización') ||
-        formData.get('organization_name') ||
-        formData.get('organizationName') ||
-        formData.get('nombre_organizacion') ||
-        formData.get('nombreOrganizacion') ||
-        ''
-      ).toString().trim();
-
-      city = (
-        formData.get('city') ||
-        formData.get('ciudad') ||
-        ''
-      ).toString().trim();
-
-      country = (
-        formData.get('country') ||
-        formData.get('pais') ||
-        formData.get('país') ||
-        ''
-      ).toString().trim();
+      payload = Object.fromEntries(formData.entries());
     }
 
-    if (!name || !email || !message) {
+    const data = {
+      role: (payload.role as string) || 'otros',
+      name: (payload.name || payload.nombre || '').toString(),
+      email: (payload.email || '').toString(),
+      phone: (payload.phone || payload.telefono || '').toString(),
+      organization: (payload.organization || '').toString(),
+      city: (payload.city || '').toString(),
+      country: (payload.country || '').toString(),
+      message: (payload.message || payload.mensaje || '').toString(),
+    };
+
+    if (!data.name || !data.email || !data.message) {
       return NextResponse.json(
         { ok: false, error: 'Faltan campos obligatorios.' },
         { status: 400 },
       );
     }
 
-    const to = process.env.CONTACT_TO || process.env.SMTP_USER;
-    const from = process.env.CONTACT_FROM || process.env.SMTP_USER;
+    const to = process.env.CONTACT_TO || process.env.SMTP_USER || '';
+    const from = process.env.CONTACT_FROM || process.env.SMTP_USER || '';
 
-    const subject = `Nuevo mensaje de contacto de ${name}`;
+    const roleLabel = ROLE_LABELS[data.role] ?? 'Otros';
+    const subject = `Nuevo mensaje de contacto - ${data.name}`;
+
+    // ---------- HTML DEL CORREO ----------
 
     const html = `
-      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f5f5f5; padding: 24px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden;">
-          <tr>
-            <td style="padding: 24px 24px 16px 24px; text-align: center; border-bottom: 1px solid #eee;">
-              <img
-                src="cid:profefranko-logo"
-                alt="Profe Franko"
-                style="max-width: 180px; height: auto; display: block; margin: 0 auto 8px auto;"
-              />
-              <p style="margin: 0; font-size: 12px; color: #888;">Nuevo mensaje desde el formulario de contacto</p>
-            </td>
-          </tr>
+  <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f5f5f5; padding: 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden;">
+      <tr>
+        <td style="padding: 24px 24px 16px 24px; text-align: center; border-bottom: 1px solid #eee;">
+          <img
+            src="https://profefranko.com/img/logo-profefranko.png"
+            alt="Profe Franko"
+            style="max-width: 180px; height: auto; display: block; margin: 0 auto 8px auto;"
+          />
+          <p style="margin: 0; font-size: 12px; color: #888;">
+            Nuevo mensaje desde el formulario de contacto
+          </p>
+        </td>
+      </tr>
 
-          <tr>
-            <td style="padding: 24px;">
-              <h1 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 600; color: #111;">
-                Detalles del contacto
-              </h1>
+      <tr>
+        <td>
+          <div style="
+            background-color:#ffffff;
+            border-radius:12px;
+            padding:16px 18px;
+            border:1px solid #e5e7eb;
+            box-shadow:0 4px 16px rgba(15,23,42,0.08);
+            color:#111827;
+            font-size:13px;
+          ">
 
-              <table cellpadding="0" cellspacing="0" style="width: 100%; font-size: 14px; border-collapse: collapse; margin-bottom: 16px;">
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; width: 120px;">Nombre</td>
-                  <td style="padding: 6px 0;">${escapeHtml(name)}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600;">Email</td>
-                  <td style="padding: 6px 0;">${escapeHtml(email)}</td>
-                </tr>
-                ${
-                  phone
-                    ? `
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600;">Teléfono</td>
-                  <td style="padding: 6px 0;">${escapeHtml(phone)}</td>
-                </tr>
-                `
-                    : ''
-                }
-                ${
-                  orgType
-                    ? `
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600;">Tipo de entidad</td>
-                  <td style="padding: 6px 0;">${escapeHtml(orgType)}</td>
-                </tr>
-                `
-                    : ''
-                }
-                ${
-                  organization
-                    ? `
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600;">Organización</td>
-                  <td style="padding: 6px 0;">${escapeHtml(organization)}</td>
-                </tr>
-                `
-                    : ''
-                }
-                ${
-                  city
-                    ? `
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600;">Ciudad</td>
-                  <td style="padding: 6px 0;">${escapeHtml(city)}</td>
-                </tr>
-                `
-                    : ''
-                }
-                ${
-                  country
-                    ? `
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600;">País</td>
-                  <td style="padding: 6px 0;">${escapeHtml(country)}</td>
-                </tr>
-                `
-                    : ''
-                }
-              </table>
+            <h3 style="margin:0 0 8px 0;font-size:13px;color:#4b5563;text-transform:uppercase;letter-spacing:0.08em;">
+              Datos del contacto
+            </h3>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-size:13px;margin-bottom:10px;">
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;width:150px;">Perfil:</td>
+                <td style="padding:3px 0;color:#111827;font-weight:600;">${roleLabel}</td>
+              </tr>
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;">Nombre:</td>
+                <td style="padding:3px 0;color:#111827;">${data.name}</td>
+              </tr>
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;">Email:</td>
+                <td style="padding:3px 0;color:#111827;">
+                  <a href="mailto:${data.email}" style="color:#2563eb;text-decoration:none;">${data.email}</a>
+                </td>
+              </tr>
+              ${
+                data.phone
+                  ? `
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;">Teléfono:</td>
+                <td style="padding:3px 0;color:#111827;">${data.phone}</td>
+              </tr>
+              `
+                  : ''
+              }
+            </table>
 
-              <h2 style="margin: 16px 0 8px 0; font-size: 16px; font-weight: 600; color: #111;">
-                Mensaje
-              </h2>
-              <p style="white-space: pre-wrap; margin: 0; line-height: 1.6; font-size: 14px; color: #333;">
-                ${escapeHtml(message)}
-              </p>
-            </td>
-          </tr>
+            ${
+              data.organization
+                ? `
+            <h3 style="margin:8px 0 6px 0;font-size:13px;color:#4b5563;text-transform:uppercase;letter-spacing:0.08em;">
+              Organización
+            </h3>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-size:13px;margin-bottom:10px;">
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;width:150px;">Nombre:</td>
+                <td style="padding:3px 0;color:#111827;">${data.organization}</td>
+              </tr>
+            </table>
+            `
+                : ''
+            }
 
-          <tr>
-            <td style="padding: 16px 24px 24px 24px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee;">
-              Este mensaje se ha enviado desde el formulario de tu sitio web.
-            </td>
-          </tr>
-        </table>
-      </div>
-    `;
+            <h3 style="margin:8px 0 6px 0;font-size:13px;color:#4b5563;text-transform:uppercase;letter-spacing:0.08em;">
+              Ubicación
+            </h3>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-size:13px;margin-bottom:10px;">
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;width:150px;">Ciudad:</td>
+                <td style="padding:3px 0;color:#111827;">${data.city}</td>
+              </tr>
+              <tr>
+                <td style="padding:3px 0;color:#6b7280;">País:</td>
+                <td style="padding:3px 0;color:#111827;">${data.country}</td>
+              </tr>
+            </table>
 
-    const text =
-      [
-        'Nuevo mensaje de contacto',
-        '',
-        `Nombre: ${name}`,
-        `Email: ${email}`,
-        phone ? `Teléfono: ${phone}` : '',
-        orgType ? `Tipo de entidad: ${orgType}` : '',
-        organization ? `Organización: ${organization}` : '',
-        city ? `Ciudad: ${city}` : '',
-        country ? `País: ${country}` : '',
-        '',
-        'Mensaje:',
-        message,
-      ]
-        .filter(Boolean)
-        .join('\n');
+            <h3 style="margin:8px 0 6px 0;font-size:13px;color:#4b5563;text-transform:uppercase;letter-spacing:0.08em;">
+              Mensaje
+            </h3>
+            <div style="
+              font-size:13px;
+              line-height:1.5;
+              color:#111827;
+              background-color:#f9fafb;
+              border-radius:8px;
+              padding:10px 12px;
+              border:1px solid #e5e7eb;
+              white-space:pre-wrap;
+            ">
+              ${escapeHtml(data.message)}
+            </div>
+
+            <div style="margin-top:10px;font-size:11px;color:#9ca3af;text-align:right;">
+              Ver más en
+              <a href="https://profefranko.com" style="color:#facc15;text-decoration:none;font-weight:600;">
+                profefranko.com
+              </a>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+`;
+
+    const text = `
+Nuevo mensaje de contacto
+
+Perfil: ${roleLabel}
+Nombre: ${data.name}
+Email: ${data.email}
+${data.phone ? `Teléfono: ${data.phone}` : ''}
+
+Organización: ${data.organization || '-'}
+
+Ciudad: ${data.city}
+País: ${data.country}
+
+Mensaje:
+${data.message}
+`.trim();
+
+    // ---------- PDF ----------
+
+    const logoPath = path.join(
+      process.cwd(),
+      'public',
+      'img',
+      'logo-profefranko.png',
+    );
+
+    const pdfBuffer = await buildContactPdf(data, logoPath);
+
+    // ---------- ENVÍO ----------
 
     await transporter.sendMail({
       from,
@@ -313,12 +231,11 @@ export async function POST(req: Request) {
       subject,
       html,
       text,
-      replyTo: email,
+      replyTo: data.email,
       attachments: [
         {
-          filename: 'logo-profefranko.png',
-          path: LOGO_PATH,
-          cid: 'profefranko-logo',
+          filename: 'contacto-profefranko.pdf',
+          content: pdfBuffer,
         },
       ],
     });
@@ -333,9 +250,12 @@ export async function POST(req: Request) {
   }
 }
 
+// Preflight CORS si lo necesitas
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200 });
 }
+
+// ---------- UTILS ----------
 
 function escapeHtml(str: string) {
   return str
@@ -344,4 +264,292 @@ function escapeHtml(str: string) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// ===== PDF (CONTACTO) =====
+
+async function buildContactPdf(
+  data: {
+    role: string;
+    name: string;
+    email: string;
+    phone?: string;
+    organization?: string;
+    city: string;
+    country: string;
+    message: string;
+  },
+  logoPath: string,
+): Promise<Buffer> {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage();
+  const { width, height } = page.getSize();
+
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  let logoImage;
+  try {
+    const logoBytes = fs.readFileSync(logoPath);
+    logoImage = await pdfDoc.embedPng(logoBytes);
+  } catch {
+    logoImage = undefined;
+  }
+
+  const roleLabel = ROLE_LABELS[data.role] ?? 'Otros';
+
+  let y = drawHeader(page, {
+    width,
+    height,
+    fontRegular,
+    fontBold,
+    logoImage,
+    title: 'Formulario de contacto',
+  });
+
+  const marginX = 50;
+
+  // Datos de contacto
+  y = sectionTitle(page, fontBold, 'Datos del contacto', y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Perfil', roleLabel, y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Nombre', data.name, y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Email', data.email, y, width, marginX);
+  if (data.phone) {
+    y = infoRow(page, fontRegular, fontBold, 'Teléfono', data.phone, y, width, marginX);
+  }
+
+  // Organización
+  if (data.organization) {
+    y = sectionTitle(page, fontBold, 'Organización', y, width, marginX);
+    y = infoRow(
+      page,
+      fontRegular,
+      fontBold,
+      'Organización',
+      data.organization,
+      y,
+      width,
+      marginX,
+    );
+  }
+
+  // Ubicación
+  y = sectionTitle(page, fontBold, 'Ubicación', y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Ciudad', data.city, y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'País', data.country, y, width, marginX);
+
+  // Mensaje
+  y = sectionTitle(page, fontBold, 'Mensaje', y, width, marginX);
+  page.drawText(data.message || '—', {
+    x: marginX,
+    y: y - 12,
+    size: 10,
+    font: fontRegular,
+    color: PDF_COLORS.textMain,
+    maxWidth: width - marginX * 2,
+    lineHeight: 14,
+  });
+
+  drawFooter(page, fontRegular, width);
+
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
+}
+
+function drawHeader(
+  page: any,
+  opts: {
+    width: number;
+    height: number;
+    fontRegular: any;
+    fontBold: any;
+    logoImage?: any;
+    title: string;
+    subtitle?: string;
+  },
+): number {
+  const { width, height, fontRegular, fontBold, logoImage, title, subtitle } =
+    opts;
+  const headerHeight = 90;
+  const marginX = 50;
+
+  // Fondo header
+  page.drawRectangle({
+    x: 0,
+    y: height - headerHeight,
+    width,
+    height: headerHeight,
+    color: PDF_COLORS.headerBg,
+  });
+
+  // Franja amarilla
+  page.drawRectangle({
+    x: 0,
+    y: height - headerHeight - 4,
+    width,
+    height: 4,
+    color: PDF_COLORS.yellow,
+  });
+
+  // Logo
+  if (logoImage) {
+    const logoTargetHeight = 60;
+    const scale = logoTargetHeight / logoImage.height;
+    const logoWidth = logoImage.width * scale;
+    const logoX = marginX - 10;
+    const logoY = height - headerHeight + (headerHeight - logoTargetHeight) / 2;
+
+    page.drawImage(logoImage, {
+      x: logoX,
+      y: logoY,
+      width: logoWidth,
+      height: logoTargetHeight,
+    });
+  }
+
+  const titleX = marginX + 80;
+
+  page.drawText('Profe Franko', {
+    x: titleX,
+    y: height - 40,
+    size: 20,
+    font: fontBold,
+    color: PDF_COLORS.yellow,
+  });
+
+  page.drawText(title, {
+    x: titleX,
+    y: height - 58,
+    size: 14,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('es-CL');
+
+  page.drawText(`Fecha de solicitud: ${formattedDate}`, {
+    x: titleX,
+    y: height - 74,
+    size: 10,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
+
+  if (subtitle) {
+    page.drawText(subtitle, {
+      x: titleX,
+      y: height - 88,
+      size: 10,
+      font: fontRegular,
+      color: PDF_COLORS.textMuted,
+    });
+  }
+
+  return height - headerHeight - 40;
+}
+
+function sectionTitle(
+  page: any,
+  fontBold: any,
+  title: string,
+  y: number,
+  pageWidth: number,
+  marginX: number,
+): number {
+  y -= 20;
+
+  page.drawText(title.toUpperCase(), {
+    x: marginX,
+    y,
+    size: 11,
+    font: fontBold,
+    color: PDF_COLORS.textMain,
+  });
+
+  y -= 6;
+
+  page.drawRectangle({
+    x: marginX,
+    y,
+    width: pageWidth - marginX * 2,
+    height: 0.7,
+    color: PDF_COLORS.line,
+  });
+
+  return y - 12;
+}
+
+function infoRow(
+  page: any,
+  fontRegular: any,
+  fontBold: any,
+  label: string,
+  value: string,
+  y: number,
+  pageWidth: number,
+  marginX: number,
+): number {
+  if (!value) return y;
+
+  const labelText = `${label}: `;
+  const size = 10;
+  const labelWidth = fontBold.widthOfTextAtSize(labelText, size);
+
+  page.drawText(labelText, {
+    x: marginX,
+    y,
+    size,
+    font: fontBold,
+    color: PDF_COLORS.textMuted,
+  });
+
+  page.drawText(value, {
+    x: marginX + labelWidth,
+    y,
+    size,
+    font: fontRegular,
+    color: PDF_COLORS.textMain,
+    maxWidth: pageWidth - marginX * 2 - labelWidth,
+    lineHeight: 13,
+  });
+
+  return y - 16;
+}
+
+function drawFooter(page: any, fontRegular: any, pageWidth: number) {
+  const marginX = 50;
+  const baseY = 60;
+
+  page.drawRectangle({
+    x: marginX,
+    y: baseY + 24,
+    width: pageWidth - marginX * 2,
+    height: 0.7,
+    color: PDF_COLORS.line,
+  });
+
+  page.drawText('Profe Franko · Boxing Coach', {
+    x: marginX,
+    y: baseY + 10,
+    size: 9,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
+
+  page.drawText('Sitio web: profefranko.com', {
+    x: marginX,
+    y: baseY - 4,
+    size: 9,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
+
+  page.drawText('Email: profefrankoesteban@gmail.com', {
+    x: marginX,
+    y: baseY - 18,
+    size: 9,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
 }

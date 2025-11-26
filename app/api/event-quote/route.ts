@@ -1,9 +1,15 @@
-// app/api/event-quote/route.ts
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import path from 'path';
+import fs from 'fs';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+
+const LOGO_URL =
+  process.env.NEXT_PUBLIC_SITE_URL
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/img/logo-profefranko.png`
+    : 'https://profefranko.com/img/logo-profefranko.png';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -14,6 +20,14 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   },
 });
+
+const PDF_COLORS = {
+  headerBg: rgb(5 / 255, 5 / 255, 5 / 255),
+  yellow: rgb(255 / 255, 214 / 255, 10 / 255),
+  textMain: rgb(17 / 255, 24 / 255, 39 / 255),
+  textMuted: rgb(107 / 255, 114 / 255, 128 / 255),
+  line: rgb(229 / 255, 231 / 255, 235 / 255),
+};
 
 export async function POST(req: Request) {
   try {
@@ -47,12 +61,33 @@ export async function POST(req: Request) {
         ? additional_services.join(', ')
         : 'N/A';
 
-    // Ruta al logo (igual que en tu formulario de contacto)
     const logoPath = path.join(
       process.cwd(),
       'public',
       'img',
       'logo-profefranko.png',
+    );
+
+    // PDF (sigue usando el logo del archivo local)
+    const pdfBuffer = await buildEventQuotePdf(
+      {
+        client_name,
+        client_email,
+        client_phone,
+        event_date,
+        event_time,
+        event_type,
+        number_of_fights,
+        expected_attendance,
+        budget_range,
+        venue_name,
+        venue_address,
+        ring_needed,
+        equipmentListText,
+        additionalListText,
+        special_requirements,
+      },
+      logoPath,
     );
 
     await transporter.sendMail({
@@ -87,13 +122,14 @@ Servicios adicionales: ${additionalListText}
 [REQUERIMIENTOS ESPECIALES]
 ${special_requirements || '-'}
       `.trim(),
+      // 👇 HTML SIN LOGO, SOLO TEXTO + URL
       html: `
   <div style="background-color:#f3f4f6;margin:0;padding:20px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;margin:0 auto;">
       <tr>
-        <td style="text-align:center;padding-bottom:12px;">
+        <td style="text-align:center;padding:16px 12px 12px 12px;">
           <img
-            src="cid:profefranko-logo"
+            src="${LOGO_URL}"
             alt="Profe Franko"
             width="80"
             height="80"
@@ -215,7 +251,7 @@ ${special_requirements || '-'}
               background-color:#f9fafb;
               border-radius:8px;
               padding:10px 12px;
-              border:1px solid #e5e7eb;
+              border:1px solid:#e5e7eb;
               white-space:pre-wrap;
             ">
               ${(special_requirements || '').replace(/\n/g, '<br />') || '—'}
@@ -233,11 +269,11 @@ ${special_requirements || '-'}
     </table>
   </div>
 `,
+      // 👇 SOLO adjuntamos el PDF (sin logo como cid)
       attachments: [
         {
-          filename: 'logo-profefranko.png',
-          path: logoPath,
-          cid: 'profefranko-logo',
+          filename: 'cotizacion-evento-profefranko.pdf',
+          content: pdfBuffer,
         },
       ],
     });
@@ -250,4 +286,365 @@ ${special_requirements || '-'}
       { status: 500 },
     );
   }
+}
+
+// ===== PDF (EVENTO) =====
+
+async function buildEventQuotePdf(
+  data: {
+    client_name: string;
+    client_email: string;
+    client_phone: string;
+    event_date?: string;
+    event_time?: string;
+    event_type?: string;
+    number_of_fights: number;
+    expected_attendance: number;
+    budget_range?: string;
+    venue_name?: string;
+    venue_address?: string;
+    ring_needed: boolean;
+    equipmentListText: string;
+    additionalListText: string;
+    special_requirements?: string;
+  },
+  logoPath: string,
+): Promise<Buffer> {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage();
+  const { width, height } = page.getSize();
+
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  let logoImage;
+  try {
+    const logoBytes = fs.readFileSync(logoPath);
+    logoImage = await pdfDoc.embedPng(logoBytes);
+  } catch {
+    logoImage = undefined;
+  }
+
+  let y = drawHeader(page, {
+    width,
+    height,
+    fontRegular,
+    fontBold,
+    logoImage,
+    title: 'Cotización de evento',
+  });
+
+  const marginX = 50;
+
+  // Datos cliente
+  y = sectionTitle(page, fontBold, 'Datos del cliente', y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Nombre', data.client_name, y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Email', data.client_email, y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Teléfono', data.client_phone, y, width, marginX);
+
+  // Detalles del evento
+  y = sectionTitle(page, fontBold, 'Detalles del evento', y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Fecha', data.event_date || '-', y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Hora', data.event_time || '-', y, width, marginX);
+  y = infoRow(page, fontRegular, fontBold, 'Tipo de evento', data.event_type || '-', y, width, marginX);
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Número de peleas',
+    String(data.number_of_fights),
+    y,
+    width,
+    marginX,
+  );
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Cantidad de asistentes (aprox.)',
+    String(data.expected_attendance),
+    y,
+    width,
+    marginX,
+  );
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Presupuesto',
+    data.budget_range || '-',
+    y,
+    width,
+    marginX,
+  );
+
+  // Lugar
+  y = sectionTitle(page, fontBold, 'Lugar del evento', y, width, marginX);
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Nombre del lugar',
+    data.venue_name || '-',
+    y,
+    width,
+    marginX,
+  );
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Dirección',
+    data.venue_address || '-',
+    y,
+    width,
+    marginX,
+  );
+
+  // Servicios
+  y = sectionTitle(page, fontBold, 'Servicios y equipo', y, width, marginX);
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Ring profesional',
+    data.ring_needed ? 'Sí' : 'No',
+    y,
+    width,
+    marginX,
+  );
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Equipo necesario',
+    data.equipmentListText,
+    y,
+    width,
+    marginX,
+  );
+  y = infoRow(
+    page,
+    fontRegular,
+    fontBold,
+    'Servicios adicionales',
+    data.additionalListText,
+    y,
+    width,
+    marginX,
+  );
+
+  // Requerimientos especiales
+  y = sectionTitle(page, fontBold, 'Requerimientos especiales', y, width, marginX);
+  page.drawText(data.special_requirements || '—', {
+    x: marginX,
+    y: y - 12,
+    size: 10,
+    font: fontRegular,
+    color: PDF_COLORS.textMain,
+    maxWidth: width - marginX * 2,
+    lineHeight: 14,
+  });
+
+  drawFooter(page, fontRegular, width);
+
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
+}
+
+// Helpers compartidos
+
+function drawHeader(
+  page: any,
+  opts: {
+    width: number;
+    height: number;
+    fontRegular: any;
+    fontBold: any;
+    logoImage?: any;
+    title: string;
+    subtitle?: string;
+  },
+): number {
+  const { width, height, fontRegular, fontBold, logoImage, title, subtitle } =
+    opts;
+  const headerHeight = 90;
+  const marginX = 50;
+
+  page.drawRectangle({
+    x: 0,
+    y: height - headerHeight,
+    width,
+    height: headerHeight,
+    color: PDF_COLORS.headerBg,
+  });
+
+  page.drawRectangle({
+    x: 0,
+    y: height - headerHeight - 4,
+    width,
+    height: 4,
+    color: PDF_COLORS.yellow,
+  });
+
+  if (logoImage) {
+    const logoTargetHeight = 60;
+    const scale = logoTargetHeight / logoImage.height;
+    const logoWidth = logoImage.width * scale;
+    const logoX = marginX - 10;
+    const logoY = height - headerHeight + (headerHeight - logoTargetHeight) / 2;
+
+    page.drawImage(logoImage, {
+      x: logoX,
+      y: logoY,
+      width: logoWidth,
+      height: logoTargetHeight,
+    });
+  }
+
+  const titleX = marginX + 80;
+
+  page.drawText('Profe Franko', {
+    x: titleX,
+    y: height - 40,
+    size: 20,
+    font: fontBold,
+    color: PDF_COLORS.yellow,
+  });
+
+  page.drawText(title, {
+    x: titleX,
+    y: height - 58,
+    size: 14,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('es-CL');
+
+  page.drawText(`Fecha de solicitud: ${formattedDate}`, {
+    x: titleX,
+    y: height - 74,
+    size: 10,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
+
+  if (subtitle) {
+    page.drawText(subtitle, {
+      x: titleX,
+      y: height - 88,
+      size: 10,
+      font: fontRegular,
+      color: PDF_COLORS.textMuted,
+    });
+  }
+
+  return height - headerHeight - 40;
+}
+
+function sectionTitle(
+  page: any,
+  fontBold: any,
+  title: string,
+  y: number,
+  pageWidth: number,
+  marginX: number,
+): number {
+  y -= 20;
+
+  page.drawText(title.toUpperCase(), {
+    x: marginX,
+    y,
+    size: 11,
+    font: fontBold,
+    color: PDF_COLORS.textMain,
+  });
+
+  y -= 6;
+
+  page.drawRectangle({
+    x: marginX,
+    y,
+    width: pageWidth - marginX * 2,
+    height: 0.7,
+    color: PDF_COLORS.line,
+  });
+
+  return y - 12;
+}
+
+function infoRow(
+  page: any,
+  fontRegular: any,
+  fontBold: any,
+  label: string,
+  value: string,
+  y: number,
+  pageWidth: number,
+  marginX: number,
+): number {
+  if (!value) return y;
+
+  const labelText = `${label}: `;
+  const size = 10;
+  const labelWidth = fontBold.widthOfTextAtSize(labelText, size);
+
+  page.drawText(labelText, {
+    x: marginX,
+    y,
+    size,
+    font: fontBold,
+    color: PDF_COLORS.textMuted,
+  });
+
+  page.drawText(value, {
+    x: marginX + labelWidth,
+    y,
+    size,
+    font: fontRegular,
+    color: PDF_COLORS.textMain,
+    maxWidth: pageWidth - marginX * 2 - labelWidth,
+    lineHeight: 13,
+  });
+
+  return y - 16;
+}
+
+function drawFooter(page: any, fontRegular: any, pageWidth: number) {
+  const marginX = 50;
+  const baseY = 60;
+
+  page.drawRectangle({
+    x: marginX,
+    y: baseY + 24,
+    width: pageWidth - marginX * 2,
+    height: 0.7,
+    color: PDF_COLORS.line,
+  });
+
+  page.drawText('Profe Franko · Boxing Coach', {
+    x: marginX,
+    y: baseY + 10,
+    size: 9,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
+
+  page.drawText('Sitio web: profefranko.com', {
+    x: marginX,
+    y: baseY - 4,
+    size: 9,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
+
+  page.drawText('Email: profefrankoesteban@gmail.com', {
+    x: marginX,
+    y: baseY - 18,
+    size: 9,
+    font: fontRegular,
+    color: PDF_COLORS.textMuted,
+  });
 }

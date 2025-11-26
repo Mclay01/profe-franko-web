@@ -1,122 +1,86 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import { ProductGrid } from '@/components/product-grid';
-import { supabase, Product } from '@/lib/supabase';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingBag, Search } from 'lucide-react';
-import { motion } from 'framer-motion';
+// app/tienda/page.tsx
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function TiendaPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [categories, setCategories] = useState<string[]>([]);
-
-  const loadProducts = async () => {
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('published', true)
-      .order('created_at', { ascending: false });
-
-    if (data) {
-      setProducts(data);
-      const categorySet = new Set(data.map((p) => p.category));
-      const uniqueCategories = Array.from(categorySet);
-      setCategories(uniqueCategories);
-    }
-  };
-
-  const filterProducts = useCallback(() => {
-    let filtered = products;
-
-    if (searchTerm) {
-      filtered = filtered.filter((p) =>
-        p.title.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
-    }
-
-    setFilteredProducts(filtered);
-  }, [products, searchTerm, selectedCategory]);
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  useEffect(() => {
-    filterProducts();
-  }, [filterProducts]);
-
   return (
-    <div className="min-h-screen bg-white">
-      <section className="py-20 bg-gradient-to-br from-[#FFD60A] to-[#FFA500]">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <ShoppingBag className="h-16 w-16 text-[#0A0A0A] mx-auto mb-6" />
-            <h1 className="text-5xl md:text-6xl font-bold text-[#0A0A0A] mb-4 font-[var(--font-saira)]">
-              Tienda Olymphus
-            </h1>
-            <p className="text-xl text-[#0A0A0A]/80 max-w-2xl mx-auto">
-              Equipamiento profesional de boxeo. Patrocinador oficial.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-4">
+      {/* Glow de fondo */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(0,255,255,0.15),transparent_55%)]" />
 
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white"
-              />
-            </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-64 bg-white">
-                <SelectValue placeholder="Todas las categorías" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <main className="relative z-10 w-full max-w-xl text-center">
+        {/* Badge superior */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-[#111111]/80 px-4 py-1 mb-6">
+          <Image
+            src="/img/olymphus-icon.png"
+            alt="Olymphus"
+            width={22}
+            height={22}
+            className="h-[22px] w-[22px] rounded-sm object-contain"
+          />
+          <span className="text-xs font-medium text-cyan-300 tracking-wide uppercase">
+            Tienda Olymphus · Próximamente
+          </span>
+        </div>
+
+        {/* Logo + nombre */}
+        <div className="flex flex-col items-center gap-3 mb-4">
+          <div className="flex items-center justify-center rounded-full bg-black/60 border border-cyan-400/40 p-3">
+            <Image
+              src="/img/olymphus-icon.png"
+              alt="Logo Olymphus"
+              width={64}
+              height={64}
+              className="h-16 w-16 rounded-md object-contain"
+            />
           </div>
+          <p className="text-sm font-semibold tracking-[0.25em] uppercase text-cyan-300">
+            OLYMPHUS
+          </p>
         </div>
-      </section>
 
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          {filteredProducts.length > 0 ? (
-            <ProductGrid products={filteredProducts} />
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">
-                No se encontraron productos.
-              </p>
-            </div>
-          )}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 font-[var(--font-saira)] tracking-tight">
+          TIENDA PRONTO
+        </h1>
+
+        <p className="text-sm md:text-base text-white/70 max-w-md mx-auto mb-8">
+          Muy pronto podrás encontrar equipamiento, indumentaria y accesorios
+          seleccionados por el Profe. Estamos afinando los últimos detalles
+          para abrir la tienda Olymphus.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button
+            asChild
+            className="bg-transparent text-[#FFD60A] border-2 border-[#FFD60A] hover:bg-[#FFD60A] hover:text-[#0A0A0A] font-bold px-8 py-4"
+          >
+            <Link href="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver al inicio
+            </Link>
+          </Button>
+
+          <Button
+            disabled
+            className="bg-gradient-to-r from-cyan-400 to-cyan-300 text-[#0A0A0A] font-semibold px-6 opacity-70 cursor-not-allowed"
+          >
+            Tienda no disponible todavía
+          </Button>
         </div>
-      </section>
+
+        <p className="mt-6 text-[11px] text-white/40">
+          ¿Quieres entrenar o organizar un evento antes de que abra la tienda?{' '}
+          <Link
+            href="/#quien-eres"
+            className="text-[#FFD60A] hover:underline"
+          >
+            Contáctame aquí
+          </Link>
+          .
+        </p>
+      </main>
     </div>
   );
 }

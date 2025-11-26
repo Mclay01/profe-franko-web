@@ -39,7 +39,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#perfil" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/sobre-mi" className="text-white/70 hover:text-white transition-colors">
                   Perfil
                 </Link>
               </li>
@@ -56,7 +56,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/tienda" className="text-white/70 hover:text-white transition-colors">
-                  Tienda Olymphus
+                  Olymphus
                 </Link>
               </li>
             </ul>

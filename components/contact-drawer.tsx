@@ -285,7 +285,7 @@ export function ContactDrawer({ open, onOpenChange, defaultRole }: ContactDrawer
               <input
                 type="text"
                 {...register('country')}
-                className="w-full rounded-lg bg-[#111]/80 border border.white/10 px-3 py-2.5 text-sm text-white placeholder:text.white/30 focus:outline-none focus:ring-2 focus:ring-[#FFD60A] focus:border-transparent"
+                className="w-full rounded-lg bg-[#111]/80 border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#FFD60A] focus:border-transparent"
                 placeholder="Chile"
               />
               {errors.country && (
