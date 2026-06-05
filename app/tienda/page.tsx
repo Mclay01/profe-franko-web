@@ -20,13 +20,13 @@ export default function TiendaPage() {
 
         {/* Logo + nombre */}
         <div className="flex flex-col items-center gap-3 mb-4">
-          <div className="flex items-center justify-center rounded-full bg-black/60 border border-cyan-400/40 p-3">
+          <div className="flex items-center justify-center">
             <Image
               src="/img/logo-everlast.png"
               alt="Logo Everlast"
-              width={64}
-              height={64}
-              className="h-16 w-16 rounded-md object-contain"
+              width={140}
+              height={140}
+              className="h-32 w-32 object-contain"
             />
           </div>
         </div>

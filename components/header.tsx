@@ -48,7 +48,7 @@ export default function Header() {
                   className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-[#FFD60A] transition-colors"
                 >
                   <Image
-                    src="/img/olymphus-icon.png"
+                    src="/img/logo-everlast.png"
                     alt="Olymphus"
                     width={24}
                     height={24}
