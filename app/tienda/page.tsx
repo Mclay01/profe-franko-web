@@ -14,14 +14,14 @@ export default function TiendaPage() {
         {/* Badge superior */}
         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-[#111111]/80 px-4 py-1 mb-6">
           <Image
-            src="/img/olymphus-icon.png"
-            alt="Olymphus"
+            src="/img/logo-everlast.svg"
+            alt="Everlast"
             width={22}
             height={22}
             className="h-[22px] w-[22px] rounded-sm object-contain"
           />
           <span className="text-xs font-medium text-cyan-300 tracking-wide uppercase">
-            Tienda Everlast · Próximamente
+            Tienda · Próximamente
           </span>
         </div>
 
@@ -29,7 +29,7 @@ export default function TiendaPage() {
         <div className="flex flex-col items-center gap-3 mb-4">
           <div className="flex items-center justify-center rounded-full bg-black/60 border border-cyan-400/40 p-3">
             <Image
-              src="/img/olymphus-icon.png"
+              src="/img/logo-everlast.svg"
               alt="Logo Olymphus"
               width={64}
               height={64}
