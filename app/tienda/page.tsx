@@ -21,7 +21,7 @@ export default function TiendaPage() {
             className="h-[22px] w-[22px] rounded-sm object-contain"
           />
           <span className="text-xs font-medium text-cyan-300 tracking-wide uppercase">
-            Tienda Olymphus · Próximamente
+            Tienda Everlast · Próximamente
           </span>
         </div>
 
@@ -37,7 +37,7 @@ export default function TiendaPage() {
             />
           </div>
           <p className="text-sm font-semibold tracking-[0.25em] uppercase text-cyan-300">
-            OLYMPHUS
+            EVERLAST
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export default function TiendaPage() {
         <p className="text-sm md:text-base text-white/70 max-w-md mx-auto mb-8">
           Muy pronto podrás encontrar equipamiento, indumentaria y accesorios
           seleccionados por el Profe. Estamos afinando los últimos detalles
-          para abrir la tienda Olymphus.
+          para abrir la tienda Everlast.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -20,7 +20,7 @@ import { AboutCollage } from '@/components/AboutCollage';
 
 const PHONE_E164 = '56987772483'; // +56 9 8777 2483 en formato E.164
 const WHATSAPP_URL = `https://wa.me/${PHONE_E164}?text=Hola%20Profe%20Franko,%20vengo%20desde%20tu%20web.%20Quiero%20m%C3%A1s%20info%20🙌`;
-const EMAIL = 'Fraankoestebaan@gmail.com';
+const EMAIL = 'profefrankoesteban@gmail.com';
 const GMAIL_COMPOSE_URL = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
   EMAIL,
 )}&su=${encodeURIComponent('Contacto desde profefranko.com')}`;
