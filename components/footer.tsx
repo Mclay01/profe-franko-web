@@ -56,7 +56,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/tienda" className="text-white/70 hover:text-white transition-colors">
-                  Olymphus
+                  Everlast
                 </Link>
               </li>
             </ul>
