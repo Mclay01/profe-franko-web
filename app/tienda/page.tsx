@@ -12,8 +12,8 @@ export default function TiendaPage() {
 
       <main className="relative z-10 w-full max-w-xl text-center">
         {/* Badge superior */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-[#111111]/80 px-4 py-1 mb-6">
-          <span className="text-xs font-medium text-cyan-300 tracking-wide uppercase">
+        <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/40 bg-[#111111]/80 px-4 py-1 mb-6">
+          <span className="text-xs font-medium text-yellow-300 tracking-wide uppercase">
             Tienda · Próximamente
           </span>
         </div>

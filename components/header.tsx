@@ -49,7 +49,7 @@ export default function Header() {
                 >
                   <Image
                     src="/img/logo-everlast.png"
-                    alt="Olymphus"
+                    alt="Everlast"
                     width={24}
                     height={24}
                     className="h-6 w-6 rounded-sm object-contain"
@@ -108,8 +108,8 @@ export default function Header() {
                   onClick={() => setOpen(false)}
                 >
                   <Image
-                    src="/img/olymphus-icon.png"
-                    alt="Olymphus"
+                    src="/img/logo-everlast.png"
+                    alt="Everlast"
                     width={24}
                     height={24}
                     className="h-6 w-6 rounded-sm object-contain"
